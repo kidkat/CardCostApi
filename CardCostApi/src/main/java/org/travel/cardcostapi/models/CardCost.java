@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 public class CardCost {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,5 +16,18 @@ public class CardCost {
     @Column(nullable = false)
     private String country;
     @Column(nullable = false)
-    private double cost;
+    private Double cost;
+    @Version
+    private Long version;
+
+    public CardCost(String country, Double cost) {
+        this.country = country;
+        this.cost = cost;
+    }
+
+    public CardCost(long id, String country, double cost) {
+        this.id = id;
+        this.country = country;
+        this.cost = cost;
+    }
 }
