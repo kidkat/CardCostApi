@@ -14,9 +14,9 @@ public class Utils {
     }
 
     public static String getMaskedCardNumber(String cardNumber){
-        String firstSixDigits = cardNumber.substring(0, 6);
-        String lastFourDigits = cardNumber.substring(cardNumber.length() - 4);
-        String maskedPart = "*".repeat(cardNumber.length() - 10);
+        String firstSixDigits = cardNumber.substring(0, 4);
+        String lastFourDigits = cardNumber.substring(cardNumber.length() - 2);
+        String maskedPart = "*".repeat(cardNumber.length() - 6);
         return firstSixDigits + maskedPart + lastFourDigits;
     }
 }

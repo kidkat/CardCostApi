@@ -1,16 +1,19 @@
 package org.travel.cardcostapi.controllers;
 
+import jakarta.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.travel.cardcostapi.exceptions.BadRequestException;
 import org.travel.cardcostapi.models.CardCost;
 import org.travel.cardcostapi.requests.CreateCardCostRequest;
 import org.travel.cardcostapi.requests.PaymentCardCostRequest;
+import org.travel.cardcostapi.requests.UpdateCardCostRequest;
+import org.travel.cardcostapi.responses.PaymentCardCostResponse;
 import org.travel.cardcostapi.services.CardCostService;
 import org.travel.cardcostapi.utils.Utils;
-
-import javax.smartcardio.Card;
 import java.util.List;
 
 @Log4j2
@@ -23,18 +26,24 @@ public class CardCostController {
     private CardCostService cardCostService;
 
     @PostMapping("/payment-card-cost")
-    public ResponseEntity<CardCost> getPaymentCardCost(@RequestBody PaymentCardCostRequest paymentCardCostRequest){
+    public ResponseEntity<PaymentCardCostResponse> getPaymentCardCost(@RequestBody PaymentCardCostRequest paymentCardCostRequest){
         long startTime = Utils.getStartTime();
         paymentCardCostRequest.validate();
         String maskedCardNumber = Utils.getMaskedCardNumber(paymentCardCostRequest.getCardNumber());
         log.info("{} Received 'Payment Card Cost' request for country: '{}'", PREFIX, maskedCardNumber);
 
         CardCost cardCost = cardCostService.getPaymentCardCost(paymentCardCostRequest);
+        PaymentCardCostResponse paymentCardCostResponse = new PaymentCardCostResponse(cardCost.getCountry(), cardCost.getCost());
 
         log.info("{} Request 'Payment Card Cost' request for country: '{}' executed within '{}' ms",
                 PREFIX, maskedCardNumber, Utils.getExecutionTime(startTime));
 
-        return ResponseEntity.ok(cardCost);
+        return ResponseEntity.ok(paymentCardCostResponse);
+    }
+
+    @GetMapping("/test-bad-request")
+    public void testBadRequest() {
+        throw new BadRequestException("This is a test error");
     }
 
     @PostMapping("/card-costs")
@@ -52,7 +61,7 @@ public class CardCostController {
     }
 
     @GetMapping("/card-costs")
-    public ResponseEntity<List<CardCost>> getCardCost() {
+    public ResponseEntity<List<CardCost>> getAllCardCost() {
         long startTime = Utils.getStartTime();
         log.info("{} Received 'Get ALl Card Cost' request.", PREFIX);
 
@@ -78,11 +87,12 @@ public class CardCostController {
     }
 
     @PutMapping("/card-costs/{cardCostId}")
-    public ResponseEntity<CardCost> updateCardCost(@PathVariable Long cardCostId) {
+    public ResponseEntity<CardCost> updateCardCost(@PathVariable Long cardCostId, @RequestBody UpdateCardCostRequest updateCardCostRequest) {
         long startTime = Utils.getStartTime();
+        updateCardCostRequest.validate();
         log.info("{} Received 'Update Card Cost' request for cardCostId: '{}'", PREFIX, cardCostId);
 
-        CardCost updatedCardCost = cardCostService.updateCardCostById(cardCostId);
+        CardCost updatedCardCost = cardCostService.updateCardCostById(cardCostId, updateCardCostRequest);
 
         log.info("{} Request 'Update Card Cost' request for cardCostId: '{}' executed within '{}' ms",
                 PREFIX, cardCostId, Utils.getExecutionTime(startTime));

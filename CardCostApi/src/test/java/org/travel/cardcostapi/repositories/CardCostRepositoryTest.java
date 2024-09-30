@@ -4,7 +4,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.travel.cardcostapi.models.CardCost;
+
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,26 +17,18 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author asafronov
  */
 @DataJpaTest
+@ActiveProfiles("test")
 class CardCostRepositoryTest {
     @Autowired
     private CardCostRepository cardCostRepository;
 
     @BeforeEach
     void setUp() {
-        // Clean up the repository before each test
         cardCostRepository.deleteAll();
 
-        // Insert sample data
-        cardCostRepository.save(new CardCost(1L, "US", 5.0, 1L));
-        cardCostRepository.save(new CardCost(2L, "GR", 15.0, 1L));
-        cardCostRepository.save(new CardCost(3L, "FR", 10.0, 1L));
-    }
-
-    @Test
-    void findAllCardCosts() {
-        List<CardCost> costs = cardCostRepository.findAll();
-
-        assertEquals(3, costs.size());
+        cardCostRepository.save(new CardCost("US", 5.0));
+        cardCostRepository.save(new CardCost( "GR", 15.0));
+        cardCostRepository.save(new CardCost("FR", 10.0));
     }
 
     @Test
@@ -53,6 +48,30 @@ class CardCostRepositoryTest {
     }
 
     @Test
+    void findAllCardCosts() {
+        List<CardCost> costs = cardCostRepository.findAll();
+
+        assertEquals(3, costs.size());
+    }
+
+    @Test
+    void findByIdExists() {
+        CardCost cardCost = cardCostRepository.save(new CardCost("JP", 20.0));
+        Optional<CardCost> result = cardCostRepository.findById(cardCost.getId());
+
+        assertTrue(result.isPresent());
+        assertEquals("JP", result.get().getCountry());
+        assertEquals(20.0, result.get().getCost());
+    }
+
+    @Test
+    void findByIdNotExists() {
+        Optional<CardCost> result = cardCostRepository.findById(9999L);
+
+        assertFalse(result.isPresent());
+    }
+
+    @Test
     void saveCardCost() {
         CardCost newCardCost = new CardCost( "JP", 20.0);
         CardCost savedCost = cardCostRepository.save(newCardCost);
@@ -60,17 +79,6 @@ class CardCostRepositoryTest {
         assertNotNull(savedCost.getId());
         assertEquals("JP", savedCost.getCountry());
         assertEquals(20.0, savedCost.getCost());
-    }
-
-    @Test
-    void deleteCardCost() {
-        Optional<CardCost> cardCost = cardCostRepository.findByCountry("GR");
-        assertTrue(cardCost.isPresent());
-
-        cardCostRepository.delete(cardCost.get());
-
-        Optional<CardCost> result = cardCostRepository.findByCountry("GR");
-        assertFalse(result.isPresent());
     }
 
     @Test
@@ -85,5 +93,14 @@ class CardCostRepositoryTest {
         assertEquals(25.0, updatedCost.getCost());
     }
 
+    @Test
+    void deleteCardCost() {
+        Optional<CardCost> cardCost = cardCostRepository.findByCountry("GR");
+        assertTrue(cardCost.isPresent());
 
+        cardCostRepository.delete(cardCost.get());
+
+        Optional<CardCost> result = cardCostRepository.findByCountry("GR");
+        assertFalse(result.isPresent());
+    }
 }

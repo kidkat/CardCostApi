@@ -9,14 +9,14 @@ import org.travel.cardcostapi.exceptions.BadRequestException;
  */
 @Data
 public class PaymentCardCostRequest {
-    @JsonProperty("cardNumber")
+    @JsonProperty("card_number")
     private String cardNumber;
 
     public void validate(){
         if (cardNumber == null || cardNumber.trim().isEmpty())
             throw new BadRequestException("CardNumber cannot be null or empty");
 
-        if(cardNumber.length() != 16)
-            throw new BadRequestException("CardNumber must be 16 digits");
+        if(cardNumber.length() < 8 || cardNumber.length() > 19)
+            throw new BadRequestException("CardNumber must be greater than 8 and less than 19 digits");
     }
 }

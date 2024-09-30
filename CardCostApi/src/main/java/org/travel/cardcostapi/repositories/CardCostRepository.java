@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface CardCostRepository extends JpaRepository<CardCost, Long> {
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Lock(LockModeType.OPTIMISTIC)
     Optional<CardCost> findById(Long cardCostId);
     Optional<CardCost> findByCountry(String country);
 }

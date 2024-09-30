@@ -19,6 +19,8 @@ public class UpdateCardCostRequest {
             throw new BadRequestException("Country cannot be null or empty");
         }
 
+        country = country.toUpperCase();
+
         if (cost < 0) {
             throw new BadRequestException("Cost cannot be negative");
         }
