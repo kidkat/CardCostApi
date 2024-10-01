@@ -33,7 +33,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest(properties = "spring.profiles.active=test")
+@SpringBootTest(properties = "spring.profiles.active=test2")
 @AutoConfigureMockMvc
 @Log4j2
 class CardCostControllerTest {
