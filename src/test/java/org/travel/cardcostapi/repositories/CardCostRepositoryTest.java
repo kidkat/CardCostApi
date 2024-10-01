@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.travel.cardcostapi.models.CardCost;
 
@@ -16,8 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * @author asafronov
  */
-@DataJpaTest
-@ActiveProfiles("test")
+@DataJpaTest(properties = "spring.profiles.active=test")
 class CardCostRepositoryTest {
     @Autowired
     private CardCostRepository cardCostRepository;
@@ -26,9 +26,9 @@ class CardCostRepositoryTest {
     void setUp() {
         cardCostRepository.deleteAll();
 
-        cardCostRepository.save(new CardCost("US", 5.0));
-        cardCostRepository.save(new CardCost( "GR", 15.0));
-        cardCostRepository.save(new CardCost("FR", 10.0));
+        cardCostRepository.save(new CardCost("US", 5.0, 1L));
+        cardCostRepository.save(new CardCost("GR", 15.0, 1L));
+        cardCostRepository.save(new CardCost("FR", 10.0, 1L));
     }
 
     @Test

@@ -30,4 +30,10 @@ public class CardCost {
         this.country = country;
         this.cost = cost;
     }
+
+    public CardCost(String country, double cost, Long version) {
+        this.country = country;
+        this.cost = cost;
+        this.version = version;
+    }
 }
