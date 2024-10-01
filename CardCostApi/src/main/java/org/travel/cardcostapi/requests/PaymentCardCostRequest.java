@@ -1,6 +1,9 @@
 package org.travel.cardcostapi.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.travel.cardcostapi.exceptions.BadRequestException;
 
@@ -9,6 +12,9 @@ import org.travel.cardcostapi.exceptions.BadRequestException;
  */
 @Data
 public class PaymentCardCostRequest {
+    @NotNull
+    @NotEmpty
+    @Size(min = 8, max = 19)
     @JsonProperty("card_number")
     private String cardNumber;
 

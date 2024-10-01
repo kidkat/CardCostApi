@@ -1,6 +1,8 @@
 package org.travel.cardcostapi.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.travel.cardcostapi.exceptions.BadRequestException;
 
@@ -11,8 +13,11 @@ import java.util.Locale;
  */
 @Data
 public class CreateCardCostRequest {
+    @NotNull
+    @NotEmpty
     @JsonProperty("country")
     private String country;
+    @NotNull
     @JsonProperty("cost")
     private double cost;
 

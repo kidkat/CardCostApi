@@ -125,12 +125,13 @@ public class CardCostService {
 
             return cardCostOptional.orElseThrow(()-> new ResourceNotFoundException("Card Cost with country: " + countryCode + " do not exists!"));
         }catch (ResourceAccessException e) {
+            log.error("{} Failed to connect to external API. Cause: '{}'", PREFIX, e.getMessage());
             throw new ExternalApiException("Failed to connect to external API. Please try again later.");
         } catch (HttpStatusCodeException e) {
-            // Handle specific HTTP status errors
+            log.error("{} External API returned an error. Cause: '{}'", PREFIX, e.getMessage());
             throw new ExternalApiException("External API returned an error: " + e.getStatusCode());
         } catch (RestClientException e) {
-            // Catch any other RestClient-related errors
+            log.error("{} An error occurred while communicating with the external API.. Cause: '{}'", PREFIX, e.getMessage());
             throw new ExternalApiException("An error occurred while communicating with the external API.");
         }
     }

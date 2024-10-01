@@ -1,12 +1,14 @@
 package org.travel.cardcostapi.controllers;
 
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.travel.cardcostapi.exceptions.BadRequestException;
 import org.travel.cardcostapi.models.CardCost;
 import org.travel.cardcostapi.requests.CreateCardCostRequest;
 import org.travel.cardcostapi.requests.PaymentCardCostRequest;
@@ -25,8 +27,22 @@ public class CardCostController {
     @Autowired
     private CardCostService cardCostService;
 
+    @Tag(name = "Post", description = "POST methods of CardCost APIs")
+    @Operation(summary = "Get payment card cost", description = "Getting a card cost of given card_number. The response is object with country & cost.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return of card cost"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "500", description = "Internal server error"),
+            @ApiResponse(responseCode = "502", description = "External issue with API request")
+    })
     @PostMapping("/payment-card-cost")
-    public ResponseEntity<PaymentCardCostResponse> getPaymentCardCost(@RequestBody PaymentCardCostRequest paymentCardCostRequest){
+    public ResponseEntity<PaymentCardCostResponse> getPaymentCardCost(
+            @Parameter(
+                    description = "Request in JSON format with card_number inside which user want to know the cost.",
+                    required = true
+            )
+            @RequestBody PaymentCardCostRequest paymentCardCostRequest
+    ){
         long startTime = Utils.getStartTime();
         paymentCardCostRequest.validate();
         String maskedCardNumber = Utils.getMaskedCardNumber(paymentCardCostRequest.getCardNumber());
@@ -41,13 +57,21 @@ public class CardCostController {
         return ResponseEntity.ok(paymentCardCostResponse);
     }
 
-    @GetMapping("/test-bad-request")
-    public void testBadRequest() {
-        throw new BadRequestException("This is a test error");
-    }
-
+    @Tag(name = "Post", description = "POST methods of CardCost APIs")
+    @Operation(summary = "Create a new card cost", description = "Creation of new card cost. The response is new CardCost object with id, country, cost")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Card cost created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid input/card cost already exists"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PostMapping("/card-costs")
-    public ResponseEntity<CardCost> createCardCost(@RequestBody CreateCardCostRequest createCardCostRequest) {
+    public ResponseEntity<CardCost> createCardCost(
+            @Parameter(
+                    description = "Request in JSON format to create new cardCost.",
+                    required = true
+            )
+            @RequestBody CreateCardCostRequest createCardCostRequest
+    ) {
         long startTime = Utils.getStartTime();
         createCardCostRequest.validate();
         log.info("{} Received 'Create Card Cost' request for country: '{}'", PREFIX, createCardCostRequest.getCountry());
@@ -60,6 +84,13 @@ public class CardCostController {
         return ResponseEntity.ok(cardCost);
     }
 
+    @Tag(name = "Get", description = "GET methods of CardCost APIs")
+    @Operation(summary = "Get all card cost", description = "Getting all card cost. The response is list with all founded card costs.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return all founded card costs"),
+            @ApiResponse(responseCode = "404", description = "No card costs found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/card-costs")
     public ResponseEntity<List<CardCost>> getAllCardCost() {
         long startTime = Utils.getStartTime();
@@ -73,8 +104,21 @@ public class CardCostController {
         return ResponseEntity.ok(cardCostList);
     }
 
+    @Tag(name = "Get", description = "GET methods of CardCost APIs")
+    @Operation(summary = "Get card cost by ID", description = "Getting card cost by given id. The response is CardCost object with id, country & cost")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Return found card cost by Id"),
+            @ApiResponse(responseCode = "404", description = "No card costs found"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @GetMapping("/card-costs/{cardCostId}")
-    public ResponseEntity<CardCost> getCardCost(@PathVariable Long cardCostId) {
+    public ResponseEntity<CardCost> getCardCost(
+            @Parameter(
+                    description = "Id of card cost to be retrieved.",
+                    required = true
+            )
+            @PathVariable Long cardCostId
+    ) {
         long startTime = Utils.getStartTime();
         log.info("{} Received 'Get Card Cost' request for cardCostId: '{}'", PREFIX, cardCostId);
 
@@ -86,8 +130,27 @@ public class CardCostController {
         return ResponseEntity.ok(cardCost);
     }
 
+    @Tag(name = "Put", description = "PUT method of CardCost APIs")
+    @Operation(summary = "Update card cost by ID", description = "Update an existing card cost. The response is updated CardCost object with id, country & cost")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Update & return updated card cost"),
+            @ApiResponse(responseCode = "400", description = "Invalid input"),
+            @ApiResponse(responseCode = "404", description = "Card cost already exists"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @PutMapping("/card-costs/{cardCostId}")
-    public ResponseEntity<CardCost> updateCardCost(@PathVariable Long cardCostId, @RequestBody UpdateCardCostRequest updateCardCostRequest) {
+    public ResponseEntity<CardCost> updateCardCost(
+            @Parameter(
+                    description = "Id of card cost to be updated",
+                    required = true
+            )
+            @PathVariable Long cardCostId,
+            @Parameter(
+                    description = "Request in JSON format with field that have to be updated.",
+                    required = true
+            )
+            @RequestBody UpdateCardCostRequest updateCardCostRequest
+    ) {
         long startTime = Utils.getStartTime();
         updateCardCostRequest.validate();
         log.info("{} Received 'Update Card Cost' request for cardCostId: '{}'", PREFIX, cardCostId);
@@ -100,8 +163,21 @@ public class CardCostController {
         return ResponseEntity.ok(updatedCardCost);
     }
 
+    @Tag(name = "Delete", description = "DELETE method of CardCost APIs")
+    @Operation(summary = "Delete card cost by ID", description = "Delete of and existing card cost. The response is empty with response code 204.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Return no content if card cost removed"),
+            @ApiResponse(responseCode = "404", description = "Card cost already exists"),
+            @ApiResponse(responseCode = "500", description = "Internal server error")
+    })
     @DeleteMapping("/card-costs/{cardCostId}")
-    public ResponseEntity<Void> deleteCardCost(@PathVariable Long cardCostId) {
+    public ResponseEntity<Void> deleteCardCost(
+            @Parameter(
+                    description = "Id of card cost to be deleted",
+                    required = true
+            )
+            @PathVariable Long cardCostId
+    ) {
         long startTime = Utils.getStartTime();
         log.info("{} Received 'Delete Card Cost' request for cardCostId: '{}'", PREFIX, cardCostId);
 
